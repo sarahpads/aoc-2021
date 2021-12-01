@@ -25,13 +25,25 @@ func main() {
 
 	file.Close()
 
+	var windows []int
+	bound := len(lines)
+
+	for index, line := range lines {
+		if index+2 >= bound {
+			break
+		}
+
+		total := line + lines[index+1] + lines[index+2]
+		windows = append(windows, total)
+	}
+
 	var increased int
 	var decreased int
 
-	for index, line := range lines {
+	for index, window := range windows {
 		if index == 0 {
 			continue
-		} else if line > lines[index-1] {
+		} else if window > windows[index-1] {
 			increased++
 		} else {
 			decreased++
