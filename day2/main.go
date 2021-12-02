@@ -15,8 +15,8 @@ const (
 )
 
 func main() {
-	// horizontal and vertical coords
-	coords := [...]int{0, 0}
+	// horizontal position, depth position, aim
+	coords := [...]int{0, 0, 0}
 	file, err := os.Open("./input.txt")
 
 	if err != nil {
@@ -32,12 +32,13 @@ func main() {
 		switch command {
 		case FORWARD:
 			coords[0] = coords[0] + distance
+			coords[1] = coords[1] + (coords[2] * distance)
 
 		case DOWN:
-			coords[1] = coords[1] + distance
+			coords[2] = coords[2] + distance
 
 		case UP:
-			coords[1] = coords[1] - distance
+			coords[2] = coords[2] - distance
 
 		default:
 			panic(fmt.Sprintf("Unknown command %v", command))
