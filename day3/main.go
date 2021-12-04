@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -16,6 +17,11 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
+	// part1(scanner)
+	part2(scanner)
+}
+
+func part1(scanner *bufio.Scanner) {
 	var num1s [12]int
 	var total int = 0
 
@@ -49,4 +55,63 @@ func main() {
 	// 0001 0010 1010
 	// 298
 	fmt.Println(epsilon * gamma)
+}
+
+func part2(scanner *bufio.Scanner) {
+	var lines []string
+
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	oxygen := lines
+	carbon := lines
+
+	for depth := 0; depth < 12; depth++ {
+		oxygen = filter(&oxygen, depth, 1)
+		carbon = filter(&carbon, depth, -1)
+	}
+
+	// 1111 1111 1001
+	oxygenValue, _ := strconv.ParseInt(oxygen[0], 2, 64)
+	// 0111 1000 0011
+	carbonValue, _ := strconv.ParseInt(carbon[0], 2, 64)
+
+	// 7863147
+	fmt.Println(oxygenValue * carbonValue)
+}
+
+// accept pointer of lines so that the array isn't copied; no need to waste memory
+// predicate indicates if we're looking for the most common (1) or least common (-1)
+func filter(lines *[]string, depth int, modifier int) []string {
+	if len(*lines) == 1 {
+		return *lines
+	}
+
+	var ones []string
+	var zeros []string
+
+	for _, value := range *lines {
+		if string(value[depth]) == "1" {
+			ones = append(ones, value)
+		} else {
+			zeros = append(zeros, value)
+		}
+	}
+
+	diff := len(ones) - len(zeros)
+
+	if diff == 0 {
+		if modifier > 0 {
+			return ones
+		} else {
+			return zeros
+		}
+	}
+
+	if diff*modifier > 0 {
+		return ones
+	} else {
+		return zeros
+	}
 }
