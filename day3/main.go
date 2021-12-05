@@ -82,7 +82,7 @@ func part2(scanner *bufio.Scanner) {
 }
 
 // accept pointer of lines so that the array isn't copied; no need to waste memory
-// predicate indicates if we're looking for the most common (1) or least common (-1)
+// modifier indicates if we're looking for the most common (1) or least common (-1)
 func filter(lines *[]string, depth int, modifier int) []string {
 	if len(*lines) == 1 {
 		return *lines
