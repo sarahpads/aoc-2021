@@ -44,6 +44,8 @@ func main() {
 		boardProgress = append(boardProgress, emptyProgress)
 	}
 
+	var allBingos = len(boards)
+	var bingos int
 	var score int
 
 bingo:
@@ -65,9 +67,19 @@ bingo:
 
 			hasBingo := checkForBingo(boardProgress[i])
 
-			if hasBingo {
+			if !hasBingo {
+				continue
+			}
+
+			bingos++
+			// need to remove old boards from play, as they have already won
+			if bingos == allBingos {
 				score = calculateScore(boards[i], number)
 				break bingo
+			} else {
+				boards = append(boards[:i], boards[i+1:]...)
+				boardProgress = append(boardProgress[:i], boardProgress[i+1:]...)
+				i--
 			}
 		}
 	}
