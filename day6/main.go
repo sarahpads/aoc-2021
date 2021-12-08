@@ -25,7 +25,7 @@ func main() {
 
 	fmt.Println(fishes)
 
-	for i := 1; i <= 80; i++ {
+	for i := 1; i <= 256; i++ {
 		var newFishes [9]int
 
 		// 0 index each create a new fish
