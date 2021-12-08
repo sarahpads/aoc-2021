@@ -25,10 +25,7 @@ func main() {
 
 	points := make(map[Coord]int)
 
-	// [int, int] = int
-
 	for scanner.Scan() {
-		// print(scanner.Text())
 		parts := strings.FieldsFunc(scanner.Text(), f)
 		startX, _ := strconv.Atoi(parts[0])
 		startY, _ := strconv.Atoi(parts[1])
@@ -39,11 +36,11 @@ func main() {
 		var coords []Coord
 
 		if startX == endX {
-			coords = getLineCoords(start.y, end.y, start.x, "vertical")
+			coords = getVerticalCoords(start, end)
 		} else if startY == endY {
-			coords = getLineCoords(start.x, end.x, start.y, "horizontal")
+			coords = getHorizontalCoords(start, end)
 		} else {
-			continue
+			coords = getDiagonalCoords(start, end)
 		}
 
 		for _, coord := range coords {
@@ -59,32 +56,57 @@ func main() {
 		}
 	}
 
-	// 5698
+	// 15463
 	fmt.Println(intersections)
 }
 
-func getLineCoords(a int, b int, c int, axis string) []Coord {
-	var coords []Coord
-	var start int
-	var end int
+func getHorizontalCoords(a Coord, b Coord) []Coord {
+	coords := []Coord{b}
+	inc := getInc(a.x, b.x)
 
-	if a-b > 0 {
-		start = b
-		end = a
-	} else {
-		start = a
-		end = b
-	}
-
-	for i := start; i <= end; i++ {
-		if axis == "horizontal" {
-			coords = append(coords, Coord{i, c})
-		} else {
-			coords = append(coords, Coord{c, i})
-		}
+	coord := a
+	for coord != b {
+		coords = append(coords, coord)
+		coord.x += inc
 	}
 
 	return coords
+}
+
+func getVerticalCoords(a Coord, b Coord) []Coord {
+	coords := []Coord{b}
+	inc := getInc(a.y, b.y)
+
+	coord := a
+	for coord != b {
+		coords = append(coords, coord)
+		coord.y += inc
+	}
+
+	return coords
+}
+
+func getDiagonalCoords(a Coord, b Coord) []Coord {
+	coords := []Coord{b}
+	xInc := getInc(a.x, b.x)
+	yInc := getInc(a.y, b.y)
+
+	coord := a
+	for coord != b {
+		coords = append(coords, coord)
+		coord.x += xInc
+		coord.y += yInc
+	}
+
+	return coords
+}
+
+func getInc(a int, b int) int {
+	if a-b > 0 {
+		return -1
+	} else {
+		return 1
+	}
 }
 
 func f(c rune) bool {
