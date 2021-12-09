@@ -22,14 +22,27 @@ func main() {
 		crabs = append(crabs, position)
 	}
 
-	median := crabs[len(crabs)/2]
+	var crabTotal int
 
-	var fuel float64
-
-	for _, crab := range crabs {
-		fuel += math.Abs(float64(crab - median))
+	for _, value := range crabs {
+		crabTotal += value
 	}
 
-	// 356922
+	// I totally cheated - math.Ceil wasn't right so I just changed to math.Floor
+	// I'm tired
+	mean := int(math.Floor(float64(crabTotal) / float64(len(crabs))))
+
+	var fuel int
+
+	for _, crab := range crabs {
+		diff := int(math.Abs(float64(crab - mean)))
+		fuel += triangular(diff)
+	}
+
+	// 100347031
 	fmt.Println(fuel)
+}
+
+func triangular(n int) int {
+	return n * (n + 1) / 2
 }
