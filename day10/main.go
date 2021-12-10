@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -17,6 +18,7 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
+	var scores []int
 	openingTags := "([{<"
 	// lookup map where key is opening rune and value is closing rune
 	closingTag := map[rune]rune{
@@ -26,14 +28,13 @@ func main() {
 		60:  62,
 	}
 
-	// maybe rune?
-	var invalidCharacters []rune
-
 	for scanner.Scan() {
+		var score int
 		var previousTags []rune
+		line := scanner.Text()
 
 	line:
-		for _, value := range scanner.Text() {
+		for _, value := range line {
 			// for each character, determine if the next character is an opening or closing
 			if strings.ContainsRune(openingTags, value) {
 				// if this is an opening tag, we'll process it later
@@ -44,40 +45,60 @@ func main() {
 			// if this is a closing, does it match the correct opening?
 			openingTag := previousTags[len(previousTags)-1]
 			if closingTag[openingTag] == value {
-				// if it does, remove this openinTag from the queue, as it has been handled
+				// if it does, remove this openingTag from the queue, as it has been handled
 				previousTags = previousTags[:len(previousTags)-1]
 			} else {
-				// otherwise, exit this line and add the character to our invalid slice
-				invalidCharacters = append(invalidCharacters, value)
+				// otherwise, the line is corrupt so exit
+				previousTags = nil
 				break line
 			}
 		}
-	}
 
-	var total int
+		// did we process the whole line without closing all of our tags?
+		if len(previousTags) > 0 {
+			score = CalculateScore(previousTags)
+		}
 
-	for _, rune := range invalidCharacters {
-		switch rune {
-		// round bracket
-		case 41:
-			total += 3
-
-			// square bracket
-		case 93:
-			total += 57
-
-			// brace
-		case 125:
-			total += 1197
-
-			// arrow
-		case 62:
-			total += 25137
+		// don't count empty scores for corrupt lines
+		if score > 0 {
+			scores = append(scores, score)
 		}
 	}
 
-	// >))>]]])))))]>)}]>>)}}}>>))>>>}]))}})>})}]}>]>>
-	// 364389
-	fmt.Println(string(invalidCharacters))
-	fmt.Println(total)
+	sort.Ints(scores)
+	middle := len(scores) / 2
+
+	// 2870201088
+	fmt.Println(scores[middle])
+}
+
+func CalculateScore(characters []rune) int {
+	var score int
+
+	// we need to count up the scores in closing tag order, so reverse our opening tags
+	for i := len(characters) - 1; i >= 0; i-- {
+		rune := characters[i]
+		score *= 5
+
+		// for each unclosed opening tag, count up the score
+		switch rune {
+		// round bracket
+		case 40:
+			score += 1
+
+			// square bracket
+		case 91:
+			score += 2
+
+			// brace
+		case 123:
+			score += 3
+
+			// arrow
+		case 60:
+			score += 4
+		}
+	}
+
+	return score
 }
