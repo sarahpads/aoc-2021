@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strconv"
 )
 
 func main() {
@@ -18,13 +17,13 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
-	var caves [][]int64
+	var caves [][]int
 
 	for scanner.Scan() {
-		var cave []int64
+		var cave []int
 
 		for _, value := range scanner.Text() {
-			number, _ := strconv.ParseInt(string(value), 10, 16)
+			number := int(value - '0')
 			cave = append(cave, number)
 		}
 
@@ -55,7 +54,7 @@ func main() {
 }
 
 // caves needs to be a pointer, so that we can mutate the collection
-func GetBasinSize(caves *[][]int64, caveIndex int, locationIndex int) int {
+func GetBasinSize(caves *[][]int, caveIndex int, locationIndex int) int {
 	var basinSize int
 	cave := (*caves)[caveIndex]
 	location := cave[locationIndex]
