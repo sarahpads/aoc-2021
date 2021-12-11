@@ -16,8 +16,9 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
-	var flashes int
+	var step int
 	var octopi [][]int
+	var octopiTotal int
 
 	for scanner.Scan() {
 		var row []int
@@ -27,19 +28,26 @@ func main() {
 			// https://stackoverflow.com/a/21322694
 			number := int(value - '0')
 			row = append(row, number)
+			octopiTotal++
 		}
 
 		octopi = append(octopi, row)
 	}
 
-	for i := 0; i < 100; i++ {
-		flashes += PerformStep(&octopi)
+	// keep going until we find the correct step
+	for i := 0; true; i++ {
+		var allFlashed = PerformStep(&octopi, octopiTotal)
+
+		if allFlashed {
+			step = i
+			break
+		}
 	}
 
-	fmt.Println(flashes)
+	fmt.Println(step + 1)
 }
 
-func PerformStep(octopi *[][]int) int {
+func PerformStep(octopi *[][]int, octopiTotal int) bool {
 	// my recursive fun caused a stack overflow, so will need to iterate over the collection
 	// multiple times until there are no 10s
 	var flashCounter int
@@ -70,7 +78,7 @@ func PerformStep(octopi *[][]int) int {
 		flashStack = append(flashStack, newFlashes...)
 	}
 
-	return flashCounter
+	return flashCounter == octopiTotal
 }
 
 func ProcessFlash(octopi *[][]int, rowIndex int, octopusIndex int) [][2]int {
